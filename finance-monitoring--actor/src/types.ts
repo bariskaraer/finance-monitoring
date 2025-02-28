@@ -1,11 +1,16 @@
+export interface PromptChainStep {
+    prompt: string;
+    model?: string;
+    temperature?: string;
+    maxTokens?: number;
+    responseField: string;
+}
+
 export interface Input {
     inputDatasetId: string;
     defaultDatasetId: string;
     llmProviderApiKey: string;
-    prompt: string;
-    model: string;
-    temperature: string;
-    maxTokens: number;
+    promptChain: PromptChainStep[];
     skipItemIfEmpty?: boolean;
     multipleColumns?: boolean;
     testPrompt?: boolean;
