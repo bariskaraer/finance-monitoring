@@ -8,7 +8,10 @@
 	},
 	"dependencies": {
 		"apify": "^3.2.6",
-		"crawlee": "^3.11.5"
+		"axios": "^1.8.1",
+		"crawlee": "^3.11.5",
+		"dotenv": "^16.4.7",
+		"openai": "^4.86.1"
 	},
 	"devDependencies": {
 		"@apify/eslint-config-ts": "^0.3.0",
