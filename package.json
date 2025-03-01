@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.38.0",
-    "@google/generative-ai": "^0.22.0",
-    "openai": "^4.86.1"
-  }
-}
