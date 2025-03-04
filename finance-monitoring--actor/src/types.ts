@@ -38,3 +38,74 @@ export interface LLMProvider {
         maxTokens: number
     ): Promise<string>;
 }
+
+// QUIVERQUANT
+export interface SenatorTransaction {
+    Senator: string;
+    BioGuideID: string;
+    Date: string; // ISO date format (YYYY-MM-DD)
+    Ticker: string;
+    Transaction: string;
+    Range: string;
+    Amount: string; // Could be number if you'll convert it to float
+    last_modified: string; // ISO date format (YYYY-MM-DD)
+}
+
+export interface CongressTransaction {
+    Representative: string;
+    ReportDate: string; // Can be changed to Date if needed
+    TransactionDate: string;
+    Ticker: string;
+    Transaction: string;
+    Range: string;
+    District: string;
+    House: string;
+    Amount: number;
+    Party: string;
+    TickerType: string;
+    Description: string;
+    ExcessReturn: number;
+    PriceChange: number;
+    SPYChange: number;
+    last_modified: null | string; // Assuming it might be a string in the future
+}
+
+// TradingView News
+export interface RelatedSymbol {
+    symbol: string;
+    logoid: string;
+    logourl: string;
+}
+
+export interface AstDescriptionChild {
+    type: string;
+    children: string[];
+}
+
+export interface AstDescription {
+    type: string;
+    children: AstDescriptionChild[];
+}
+
+export interface NewsArticle {
+    provider: string;
+    source: string;
+    descriptionText: string;
+    shortDescription: string;
+}
+
+export interface PriceData {
+    date: string;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
+}
+
+export interface StockData {
+    ticker: string;
+    senatorTransactions: SenatorTransaction[];
+    news: NewsArticle[];
+    priceHistory: PriceData[];
+}

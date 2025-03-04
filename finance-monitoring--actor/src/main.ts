@@ -1,7 +1,9 @@
 import { Actor, log } from "apify";
-import { fetchCongressTrading } from "./api/quiver-quant/query.js";
+import { fetchSenateTrading } from "./api/quiver-quant/query.js";
 import { fetchTradingViewNews } from "./api/trading-view/news/query.js";
 import { generateResponse } from "./gpt/start.js";
+import { getStockAssessment } from "./gpt/ChatCompletion/chatCompletion.js";
+import { SenatorTransaction, NewsArticle } from "./types.js";
 
 interface Input {
     ticker: string;
@@ -18,17 +20,33 @@ await Actor.init();
 const { ticker = "AAPL", llmAPIKey = "100" } =
     (await Actor.getInput<Input>()) ?? ({} as Input);
 
-const data = await fetchCongressTrading(ticker);
-const news = await fetchTradingViewNews(ticker);
-// console.log("-------------------------")
+const senatorTrading: SenatorTransaction[] = await fetchSenateTrading(ticker);
+// Filter between dates (inclusive)
+const today = new Date();
+const pastYearDate = new Date();
+pastYearDate.setFullYear(today.getFullYear() - 1);
+
+const filteredTransactions = senatorTrading.filter(transaction => {
+  const transactionDate = new Date(transaction.Date);
+  return transactionDate >= pastYearDate && transactionDate <= today;
+});
+
+const news: NewsArticle[] = await fetchTradingViewNews(ticker);
 // // console.log(news)
 // console.log("-------------------------")
 // console.log(data)
 // console.log("-------------------------")
-const gptResponse = await generateResponse(data, news, ticker);
+//const gptResponse = await generateResponse(senatorTrading, news, ticker);
 console.log("-------------------------");
-console.log(JSON.stringify(gptResponse));
+//console.log(JSON.stringify(gptResponse));
 console.log("-------------------------");
+
+const chatCompletionResponse = await getStockAssessment({
+    ticker: "AAPL",
+    senatorTransactions: filteredTransactions,
+    news: news,
+    priceHistory: [],
+});
 
 await Actor.exit();
 
