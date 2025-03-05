@@ -12,7 +12,7 @@ export async function getStockAssessment(stockData: StockData) {
         {
             role: "system",
             content:
-                "You are a financial analyst providing insights based on stock data.",
+                "You are a financial assistant. Your input is a JSON object with a scheme involving news_feed which gives descriptions about the new. and insider_feed which contains the senator members buy and sell history.  Transaction purchase suggests a positive trend. Assess the stock's outlook and summarize the sentiment towards the requested stock ticker.",
         },
         {
             role: "user",
