@@ -16,7 +16,7 @@ export async function getStockAssessment(stockData: StockData) {
         },
         {
             role: "user",
-            content: `Analyze the stock ticker ${stockData.ticker}.`,
+            content: `Analyze the stock ticker ${stockData.ticker}. Here is the company overview for you to start: \n\`\`\`json\n${JSON.stringify(stockData.overview, null, 2)}\n\`\`\``,
         },
     ];
 
