@@ -4,6 +4,7 @@ import { fetchTradingViewNews } from "./api/trading-view/news/query.js";
 import { generateResponse } from "./gpt/start.js";
 import { getStockAssessment } from "./gpt/ChatCompletion/chatCompletion.js";
 import { SenatorTransaction, NewsArticle } from "./types.js";
+import { fetchCompanyOverview } from "./api/alpha-vantage/query.js";
 
 interface Input {
     ticker: string;
@@ -19,6 +20,9 @@ await Actor.init();
 
 const { ticker = "AAPL", llmAPIKey = "100" } =
     (await Actor.getInput<Input>()) ?? ({} as Input);
+
+
+const companyOverview = fetchCompanyOverview(ticker);
 
 const senatorTrading: SenatorTransaction[] = await fetchSenateTrading(ticker);
 // Filter between dates (inclusive)
