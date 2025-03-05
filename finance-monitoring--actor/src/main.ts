@@ -3,7 +3,7 @@ import { fetchSenateTrading } from "./api/quiver-quant/query.js";
 import { fetchTradingViewNews } from "./api/trading-view/news/query.js";
 import { generateResponse } from "./gpt/start.js";
 import { getStockAssessment } from "./gpt/ChatCompletion/chatCompletion.js";
-import { SenatorTransaction, NewsArticle } from "./types.js";
+import { SenatorTransaction, NewsArticle, CompanyOverview } from "./types.js";
 import { fetchCompanyOverview } from "./api/alpha-vantage/query.js";
 
 interface Input {
@@ -22,7 +22,7 @@ const { ticker = "AAPL", llmAPIKey = "100" } =
     (await Actor.getInput<Input>()) ?? ({} as Input);
 
 
-const companyOverview = fetchCompanyOverview(ticker);
+const companyOverview: CompanyOverview = await fetchCompanyOverview(ticker);
 
 const senatorTrading: SenatorTransaction[] = await fetchSenateTrading(ticker);
 // Filter between dates (inclusive)
@@ -46,10 +46,11 @@ console.log("-------------------------");
 console.log("-------------------------");
 
 const chatCompletionResponse = await getStockAssessment({
+    overview: companyOverview,
     ticker: "AAPL",
     senatorTransactions: filteredTransactions,
     news: news,
-    priceHistory: [],
+    priceHistory: []
 });
 
 await Actor.exit();
