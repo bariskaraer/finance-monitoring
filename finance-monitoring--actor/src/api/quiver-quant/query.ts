@@ -15,7 +15,6 @@ export async function fetchSenateTrading(ticker: string): Promise<SenatorTransac
                 },
             }
         );
-        //console.log(response.data);
         return response.data as SenatorTransaction[];
     } catch (error) {
         console.error("Error fetching data:", error);
@@ -34,7 +33,6 @@ export async function fetchCongressTrading(ticker: string): Promise<CongressTran
                 },
             }
         );
-        console.log(response.data);
         return response.data as CongressTransaction[];
     } catch (error) {
         console.error("Error fetching data:", error);

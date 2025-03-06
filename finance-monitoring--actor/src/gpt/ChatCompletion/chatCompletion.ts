@@ -12,31 +12,31 @@ export async function getStockAssessment(stockData: StockData) {
         {
             role: "system",
             content:
-                `You are a financial assistant. Your input is a JSON object with a scheme involving news_feed which gives descriptions about the news and insider_feed which contains the senator members buy and sell history.  
-                Transaction purchase suggests a positive trend. Assess the stock's outlook and summarize the sentiment towards the requested stock ticker.
-                Prioritize the fields AnalystRatingStrongBuy, AnalystRatingBuy, AnalystRatingHold, AnalystRatingSell, AnalystRatingStrongSell when making decisions. 
-                Provide a structured JSON response following this format: 
-                {
-                stock_ticker: string;
-                analysis: {
-                    news_sentiment: {
-                    sentiment: string;
-                    reasoning: string;
-                    };
-                    insider_sentiment: {
-                    sentiment: string;
-                    reasoning: string;
-                    };
-                    technical_evaluation: {
-                    trend: string;
-                    reasoning: string;
-                    };
-                    overall_evaluation: {
-                    verdict: string;
-                    reasoning: string;
-                    };
-                };
-                }
+                `Analyze the JSON object input to assess the sentiment and outlook of a specific stock ticker, using the 'news_feed' for news descriptions and 'insider_feed' for senator buy and sell history. Prioritize Analyst Ratings in your sentiment analysis. 
+Apply the following criteria to derive your analysis:
+- Transaction purchases indicate a positive trend.
+- Consideration of news sentiment involves gauging the overall positive or negative tone of the news articles relevant to the stock.
+- Insider sentiment involves assessing the buy and sell behaviors of insiders. Purchases are generally seen as a positive indicator.
+- Technical evaluation consists of current stock trends using given Analyst Ratings.
+- Overall evaluation aggregates the assessments to provide a final sentiment verdict on the stock.
+# Steps
+1. **News Sentiment Analysis:**
+   - Review the 'news_feed' to identify positive or negative sentiments regarding the stock.
+   - Document reasoning for sentiment.
+2. **Insider Sentiment Analysis:**
+   - Evaluate 'insider_feed' for any recent purchase or sale by insiders.
+   - Document reasoning for sentiment, emphasizing purchase activities.
+3. **Technical Evaluation:**
+   - Use Analyst Ratings ('StrongBuy', 'Buy', 'Hold', 'Sell', 'StrongSell') to evaluate the stock's technical position.
+   - Document reasoning based on rating priority.
+4. **Overall Evaluation:**
+   - Combine insights from news sentiment, insider sentiment, and technical evaluation.
+   - Formulate an overall verdict and provide comprehensive reasoning.
+# Output Format
+The output should be a Markdown free text that has headers and related paragraphs
+# Notes
+- Prioritize strong buy and buy ratings while considering hold and sell ratings in the technical evaluation.
+- While forming conclusions, consider both qualitative and quantitative data from the input.
                 `,
         },
         {
@@ -64,11 +64,12 @@ export async function getStockAssessment(stockData: StockData) {
     messages.push({ role: "user", content: newsSummaries.join(" \n") });
 
     const response = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-4o-mini",
         messages,
-        max_tokens: 500,
+        max_tokens: 16000,
+        temperature: 0.25
     });
 
-    console.log(response.choices[0].message.content);
+    return response.choices[0].message.content;
 }
 

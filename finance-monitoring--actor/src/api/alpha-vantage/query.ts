@@ -6,10 +6,12 @@ dotenv.config();
 
 export async function fetchCompanyOverview(ticker: string): Promise<CompanyOverview> {
     try {
+        
         const response = await axios.get(
             `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
             {
                 headers: {'User-Agent': 'request'},
+                
             }
         );
         // console.log(response.data);

@@ -18,15 +18,18 @@ const REQUEST_INTERVAL_MS = Math.ceil(60000 / RATE_LIMIT_PER_MINUTE); // Interva
 // The init() call configures the Actor for its environment. It's recommended to start every Actor with an init()
 await Actor.init();
 
-const { ticker = "AAPL", llmAPIKey = "100" } =
+const { ticker = "TEM", llmAPIKey = "100" } =
     (await Actor.getInput<Input>()) ?? ({} as Input);
 
 
 const companyOverview: CompanyOverview = await fetchCompanyOverview(ticker);
+log.debug('Company Overview scraped');
 const senatorTrading: SenatorTransaction[] = await fetchSenateTrading(ticker);
+log.debug('Senator Trading scraped');
 const congressTrading: CongressTransaction[] = await fetchCongressTrading(ticker);
-//const news: NewsArticle[] = await fetchTradingViewNews(ticker);
-
+log.debug('Congress Trading scraped');
+const news: NewsArticle[] = await fetchTradingViewNews(ticker);
+log.debug('Congress Trading scraped');
 
 
 
@@ -45,14 +48,6 @@ const filteredCongressTransactions = congressTrading.filter(transaction => {
     return transactionDate >= pastYearDate && transactionDate <= today;
   });
 
-// console.log(filteredSenateTransactions.length);
-// console.log(filteredCongressTransactions.length);
-// throw new Error('Something bad happened');
-
-// // console.log(news)
-// console.log("-------------------------")
-// console.log(data)
-// console.log("-------------------------")
 //const gptResponse = await generateResponse(senatorTrading, news, ticker);
 console.log("-------------------------");
 //console.log(JSON.stringify(gptResponse));
@@ -60,11 +55,13 @@ console.log("-------------------------");
 
 const chatCompletionResponse = await getStockAssessment({
     overview: companyOverview,
-    ticker: "AAPL",
+    ticker: ticker,
     senatorTransactions: filteredSenateTransactions,
     congressTransactions: filteredCongressTransactions,
-    news: []
+    news: news
 });
+console.log(JSON.stringify(chatCompletionResponse));
+await Actor.pushData({ ChatCompletionResponse: chatCompletionResponse });
 
 await Actor.exit();
 
