@@ -4,7 +4,7 @@ import { StockData } from "../../types.js";
 type Message = { role: "system" | "user" | "assistant"; content: string };
 
 const openai = new OpenAI({
-    apiKey: `${process.env.OPENAPI_API_KEY}`, // Replace with your actual API key
+    apiKey: `${process.env.OPENAPI_API_KEY}`,
 });
 
 export async function getStockAssessment(stockData: StockData) {
@@ -12,7 +12,32 @@ export async function getStockAssessment(stockData: StockData) {
         {
             role: "system",
             content:
-                "You are a financial assistant. Your input is a JSON object with a scheme involving news_feed which gives descriptions about the new. and insider_feed which contains the senator members buy and sell history.  Transaction purchase suggests a positive trend. Assess the stock's outlook and summarize the sentiment towards the requested stock ticker.",
+                `You are a financial assistant. Your input is a JSON object with a scheme involving news_feed which gives descriptions about the news and insider_feed which contains the senator members buy and sell history.  
+                Transaction purchase suggests a positive trend. Assess the stock's outlook and summarize the sentiment towards the requested stock ticker.
+                Prioritize the fields AnalystRatingStrongBuy, AnalystRatingBuy, AnalystRatingHold, AnalystRatingSell, AnalystRatingStrongSell when making decisions. 
+                Provide a structured JSON response following this format: 
+                {
+                stock_ticker: string;
+                analysis: {
+                    news_sentiment: {
+                    sentiment: string;
+                    reasoning: string;
+                    };
+                    insider_sentiment: {
+                    sentiment: string;
+                    reasoning: string;
+                    };
+                    technical_evaluation: {
+                    trend: string;
+                    reasoning: string;
+                    };
+                    overall_evaluation: {
+                    verdict: string;
+                    reasoning: string;
+                    };
+                };
+                }
+                `,
         },
         {
             role: "user",
@@ -20,23 +45,23 @@ export async function getStockAssessment(stockData: StockData) {
         },
     ];
 
-    const insiderTransactions = stockData.senatorTransactions.map(
+    const insiderSenatorTransactions = stockData.senatorTransactions.map(
         (tx) =>
-            `Insider: ${tx.Senator}  ${tx.Transaction}: (${tx.Amount}) Dollars on ${tx.Date}.`
+            `Senate Insider: ${tx.Senator}  ${tx.Transaction}: (${tx.Amount}) Dollars on ${tx.Date}.`
     );
-    messages.push({ role: "user", content: insiderTransactions.join(" \n") });
+    messages.push({ role: "user", content: insiderSenatorTransactions.join(" \n") });
+
+    const insiderCongressTransactions = stockData.congressTransactions.map(
+        (tx) =>
+            `Congress Insider: ${tx.Representative}  ${tx.Transaction}: (${tx.Amount}) Dollars on ${tx.TransactionDate}.`
+    );
+    messages.push({ role: "user", content: insiderCongressTransactions.join(" \n") });
 
     const newsSummaries = stockData.news.map(
         (news) =>
             `News: ${news.provider} - ${news.source}: ${news.shortDescription} (Full news description: ${news.descriptionText}).`
     );
     messages.push({ role: "user", content: newsSummaries.join(" \n") });
-
-    // const priceSummaries = stockData.priceData.map(
-    //     (price) =>
-    //         `Price Data: ${price.date}: Open $${price.open}, Close $${price.close}, High $${price.high}, Low $${price.low}, Volume ${price.volume}.`
-    // );
-    // messages.push({ role: "user", content: priceSummaries.join(" \n") });
 
     const response = await openai.chat.completions.create({
         model: "gpt-4",
@@ -47,4 +72,3 @@ export async function getStockAssessment(stockData: StockData) {
     console.log(response.choices[0].message.content);
 }
 
-// getStockAssessment("Tell me a fun fact about space.");

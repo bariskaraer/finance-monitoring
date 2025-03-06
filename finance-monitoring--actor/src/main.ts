@@ -1,9 +1,9 @@
 import { Actor, log } from "apify";
-import { fetchSenateTrading } from "./api/quiver-quant/query.js";
+import { fetchCongressTrading, fetchSenateTrading } from "./api/quiver-quant/query.js";
 import { fetchTradingViewNews } from "./api/trading-view/news/query.js";
 import { generateResponse } from "./gpt/start.js";
 import { getStockAssessment } from "./gpt/ChatCompletion/chatCompletion.js";
-import { SenatorTransaction, NewsArticle, CompanyOverview } from "./types.js";
+import { SenatorTransaction, NewsArticle, CompanyOverview, CongressTransaction } from "./types.js";
 import { fetchCompanyOverview } from "./api/alpha-vantage/query.js";
 
 interface Input {
@@ -23,19 +23,32 @@ const { ticker = "AAPL", llmAPIKey = "100" } =
 
 
 const companyOverview: CompanyOverview = await fetchCompanyOverview(ticker);
-
 const senatorTrading: SenatorTransaction[] = await fetchSenateTrading(ticker);
+const congressTrading: CongressTransaction[] = await fetchCongressTrading(ticker);
+//const news: NewsArticle[] = await fetchTradingViewNews(ticker);
+
+
+
+
 // Filter between dates (inclusive)
 const today = new Date();
 const pastYearDate = new Date();
 pastYearDate.setFullYear(today.getFullYear() - 1);
 
-const filteredTransactions = senatorTrading.filter(transaction => {
+const filteredSenateTransactions = senatorTrading.filter(transaction => {
   const transactionDate = new Date(transaction.Date);
   return transactionDate >= pastYearDate && transactionDate <= today;
 });
 
-const news: NewsArticle[] = await fetchTradingViewNews(ticker);
+const filteredCongressTransactions = congressTrading.filter(transaction => {
+    const transactionDate = new Date(transaction.TransactionDate);
+    return transactionDate >= pastYearDate && transactionDate <= today;
+  });
+
+// console.log(filteredSenateTransactions.length);
+// console.log(filteredCongressTransactions.length);
+// throw new Error('Something bad happened');
+
 // // console.log(news)
 // console.log("-------------------------")
 // console.log(data)
@@ -48,9 +61,9 @@ console.log("-------------------------");
 const chatCompletionResponse = await getStockAssessment({
     overview: companyOverview,
     ticker: "AAPL",
-    senatorTransactions: filteredTransactions,
-    news: news,
-    priceHistory: []
+    senatorTransactions: filteredSenateTransactions,
+    congressTransactions: filteredCongressTransactions,
+    news: []
 });
 
 await Actor.exit();

@@ -12,7 +12,7 @@ export async function fetchCompanyOverview(ticker: string): Promise<CompanyOverv
                 headers: {'User-Agent': 'request'},
             }
         );
-        console.log(response.data);
+        // console.log(response.data);
         // const data = response.data;
         // const stockData: CompanyOverview = {
         //     Symbol: data.Symbol,

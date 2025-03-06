@@ -107,8 +107,8 @@ export interface StockData {
     overview: CompanyOverview;
     ticker: string;
     senatorTransactions: SenatorTransaction[];
+    congressTransactions: CongressTransaction[];
     news: NewsArticle[];
-    priceHistory: PriceData[];
 }
 
 export interface CompanyOverview {
