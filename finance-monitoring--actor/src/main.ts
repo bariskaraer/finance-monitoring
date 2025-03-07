@@ -18,7 +18,7 @@ const REQUEST_INTERVAL_MS = Math.ceil(60000 / RATE_LIMIT_PER_MINUTE); // Interva
 // The init() call configures the Actor for its environment. It's recommended to start every Actor with an init()
 await Actor.init();
 
-const { ticker = "TEM", llmAPIKey = "100" } =
+const { ticker = "COST", llmAPIKey = "100" } =
     (await Actor.getInput<Input>()) ?? ({} as Input);
 
 
@@ -29,7 +29,7 @@ log.debug('Senator Trading scraped');
 const congressTrading: CongressTransaction[] = await fetchCongressTrading(ticker);
 log.debug('Congress Trading scraped');
 const news: NewsArticle[] = await fetchTradingViewNews(ticker);
-log.debug('Congress Trading scraped');
+log.debug('News scraped');
 
 
 
@@ -60,6 +60,7 @@ const chatCompletionResponse = await getStockAssessment({
     congressTransactions: filteredCongressTransactions,
     news: news
 });
+console.log(JSON.stringify(news));
 console.log(JSON.stringify(chatCompletionResponse));
 await Actor.pushData({ ChatCompletionResponse: chatCompletionResponse });
 
