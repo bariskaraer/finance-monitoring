@@ -17,8 +17,8 @@ export async function fetchSenateTrading(ticker: string): Promise<SenatorTransac
         );
         return response.data as SenatorTransaction[];
     } catch (error) {
-        console.error("Error fetching data:", error);
-        throw error;
+        // console.error("Error fetching data:", error);
+        throw new Error("An error occured while fetching quiver quant insider data.");
     }
 }
 
@@ -35,7 +35,7 @@ export async function fetchCongressTrading(ticker: string): Promise<CongressTran
         );
         return response.data as CongressTransaction[];
     } catch (error) {
-        console.error("Error fetching data:", error);
-        throw error;
+        // console.error("Error fetching data:", error);
+        throw new Error("An error occured while fetching quiver quant insider data.");
     }
 }
