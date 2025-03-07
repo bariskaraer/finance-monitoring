@@ -88,10 +88,10 @@ export interface AstDescription {
 }
 
 export interface NewsArticle {
-    provider: string;
     source: string;
     descriptionText: string;
-    shortDescription: string;
+    publishDate: Number;
+    score: Number;
 }
 
 export interface PriceData {
