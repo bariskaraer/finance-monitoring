@@ -59,9 +59,10 @@ The output should be a Markdown free text that has headers and related paragraph
 
     const newsSummaries = stockData.news.map(
         (news) =>
-            `News: ${news.provider} - ${news.source}: ${news.shortDescription} (Full news description: ${news.descriptionText}).`
+            `${news.source} ${(new Date(Number(news.publishDate))).toLocaleDateString()}: ${news.descriptionText})`
     );
     messages.push({ role: "user", content: newsSummaries.join(" \n") });
+    // console.log(JSON.stringify(newsSummaries.join(" \n")));
 
     const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",

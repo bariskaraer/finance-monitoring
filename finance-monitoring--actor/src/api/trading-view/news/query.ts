@@ -1,6 +1,7 @@
 import { ApifyClient } from "apify-client";
 import dotenv from "dotenv";
 import { NewsArticle } from "../../../types.js";
+import { insertNewsArticle, searchTickerNews } from "../../../pinecone/client.js";
 
 dotenv.config();
 
@@ -23,21 +24,24 @@ export async function fetchTradingViewNews(
         },
         resultsLimit: 10,
     };
-    // Run the Actor and wait for it to finish
     const run = await client
         .actor("mscraper/tradingview-news-scraper")
         .call(input);
 
-    // Fetch and print Actor results from the run's dataset (if any)
-    console.log("Results from dataset");
-    console.log(
-        `💾 Check your data here: https://console.apify.com/storage/datasets/${run.defaultDatasetId}`
-    );
     const { items } = await client.dataset(run.defaultDatasetId).listItems();
-    return items.map((item: Record<string | number, unknown>) => ({
-        provider: item.provider as string,
-        source: item.source as string,
-        descriptionText: item.descriptionText as string,
-        shortDescription: item.shortDescription as string,
-    }));
+
+    for (const item of items) {
+        const newsItem = {
+            source: String(item.source),
+            descriptionText: String(item.descriptionText),
+            publishDate: Number(item.publishDate),
+            score: Number(item.score)
+        };
+    
+        // Insert news to PINECONE
+        await insertNewsArticle(newsItem, ticker);
+    }
+
+    const pcResult = await searchTickerNews(`Latest ${ticker} stock news impacting price trends, investor sentiment, and major financial events in the past quarter.`, 5, ticker);
+    return pcResult;
 }
