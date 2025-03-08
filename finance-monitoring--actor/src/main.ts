@@ -27,7 +27,8 @@ await Actor.init();
 // Burada time horizon da olmalı in days belki
 const { ticker = "AAPL", llmAPIKey = "100" } =
     (await Actor.getInput<Input>()) ?? ({} as Input);
-
+log.setLevel(log.LEVELS.INFO);
+log.info("starting");
 
 
 
@@ -41,6 +42,7 @@ const alphaVantage = await parallelFetchAlphaVantage(ticker);
 const news: TradingViewNewsArticle[] = await fetchTradingViewNewsDescriptions(ticker);
 const summarizedNews: GptNewsSummary = await generateSummaries(news);
 const quiverQuant = await parallelFetchQuiverQuant(ticker);
+log.info("fetched api calls");
 
 const filteredSenateTransactions = quiverQuant.senateTrading.filter(transaction => {
   const transactionDate = new Date(transaction.Date);
@@ -55,8 +57,8 @@ const filteredCongressTransactions = quiverQuant.congressTrading.filter(transact
 const apiResponses = {alphaVantage, summarizedNews, filteredCongressTransactions, filteredSenateTransactions}
 //log.info(JSON.stringify(apiResponses))
 const gptResponse = await generateResponse(alphaVantage, summarizedNews, filteredCongressTransactions, filteredSenateTransactions);
-log.info("final response")
-log.info(JSON.stringify(gptResponse))
+log.info("final response");
+log.info(gptResponse);
 await Actor.pushData({ report: gptResponse });
 
 await Actor.exit();
