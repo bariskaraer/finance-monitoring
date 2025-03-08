@@ -1,7 +1,8 @@
 import { ApifyClient } from "apify-client";
 import dotenv from "dotenv";
-import { NewsArticle } from "../../../types.js";
+import {NewsArticle, TradingViewNewsArticle} from "../../../types.js";
 import { insertNewsArticle, searchTickerNews } from "../../../pinecone/client.js";
+import {log} from "apify";
 
 dotenv.config();
 
@@ -49,7 +50,7 @@ export async function fetchTradingViewNews(
 
 export async function fetchTradingViewNewsDescriptions(
     ticker: any
-): Promise<String[]> {
+): Promise<TradingViewNewsArticle[]> {
     const input = {
         symbols: [`NASDAQ:${ticker}`],
         proxy: {
@@ -63,6 +64,15 @@ export async function fetchTradingViewNewsDescriptions(
         .call(input);
 
     const { items } = await client.dataset(run.defaultDatasetId).listItems();
-
-    return items.map(value => String(value.descriptionText))
+    const news: TradingViewNewsArticle[] = []
+    for (const item of items) {
+        const tradingViewNewsItem: TradingViewNewsArticle = {
+            source: String(item.source),
+            descriptionText: String(item.descriptionText),
+            publishDate: String(item.publishDate),
+            title: String(item.title)
+        }
+        news.push(tradingViewNewsItem)
+    }
+    return news
 }

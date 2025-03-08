@@ -301,3 +301,19 @@ export interface CompanyInsiderTransaction {
 export interface CompanyInsiderTransactionData {
     data: CompanyInsiderTransaction[]; // Array of transactions
 }
+
+export interface TradingViewNewsArticle {
+    source: string;
+    descriptionText: string;
+    publishDate: string;
+    title: string
+}
+
+export interface GptNewsSummary {
+    summary: NewsSummary[]
+}
+export interface NewsSummary {
+    details: string[];
+    sentiment_score: string;
+    relevance_score: string;
+}

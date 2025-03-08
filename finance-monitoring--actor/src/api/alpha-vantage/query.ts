@@ -7,20 +7,21 @@ import {
     CompanyInsiderTransactionData,
     CompanyOverview
 } from "../../types.js";
+import {log} from "apify";
 
 dotenv.config();
 
-const BASE_URL = 'https://www.alphavantage.co/query?'
+const BASE_URL = 'https://www.alphavantage.co/query?function='
+const HEADERS = {
+    headers: {'User-Agent': 'request'},
+}
 
 export async function fetchCompanyOverview(ticker: string): Promise<CompanyOverview> {
     try {
-
+        const url = `${BASE_URL}OVERVIEW&symbol=${ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`;
         const response = await axios.get(
-            `${BASE_URL}OVERVIEW&symbol=${ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
-            {
-                headers: {'User-Agent': 'request'},
-
-            }
+            url,
+            HEADERS
         );
         return response.data as CompanyOverview;
     } catch (error) {
@@ -34,10 +35,7 @@ export async function fetchIncomeStatement(ticker: string): Promise<CompanyFinan
 
         const response = await axios.get(
             `${BASE_URL}INCOME_STATEMENT&symbol=${ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
-            {
-                headers: {'User-Agent': 'request'},
-
-            }
+            HEADERS
         );
         return response.data as CompanyFinancials;
     } catch (error) {
@@ -51,10 +49,7 @@ export async function fetchBalanceSheet(ticker: string): Promise<CompanyBalanceS
 
         const response = await axios.get(
             `${BASE_URL}BALANCE_SHEET&symbol=${ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
-            {
-                headers: {'User-Agent': 'request'},
-
-            }
+            HEADERS
         );
         return response.data as CompanyBalanceSheet;
     } catch (error) {
@@ -68,10 +63,7 @@ export async function fetchCashFlowStatement(ticker: string): Promise<CompanyCas
 
         const response = await axios.get(
             `${BASE_URL}BALANCE_SHEET&symbol=${ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
-            {
-                headers: {'User-Agent': 'request'},
-
-            }
+            HEADERS
         );
         return response.data as CompanyCashFlowStatement;
     } catch (error) {
@@ -85,10 +77,7 @@ export async function fetchCompanyInsiderTransaction(ticker: string): Promise<Co
 
         const response = await axios.get(
             `${BASE_URL}BALANCE_SHEET&symbol=${ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
-            {
-                headers: {'User-Agent': 'request'},
-
-            }
+            HEADERS
         );
         return response.data as CompanyInsiderTransactionData;
     } catch (error) {

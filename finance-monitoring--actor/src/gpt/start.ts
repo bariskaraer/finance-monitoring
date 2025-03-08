@@ -1,45 +1,63 @@
 import {createThread} from "./thread.js";
-import {sendMessage} from "./message.js";
-import {runThread} from "./run.js";
+import {sendMessage, sendStringMessage} from "./message.js";
+import {runNewsThread, runThread} from "./run.js";
 import {openai} from "./client.js";
 import {sleep} from "openai/core.js";
 import {Run} from "openai/resources/beta/threads/index.js";
-import {RequiredActionFunctionToolCall, RunSubmitToolOutputsParams} from "openai/resources/beta/threads/runs/runs.js";
+import {RequiredActionFunctionToolCall} from "openai/resources/beta/threads/runs/runs.js";
+import {log} from "apify";
+import {GptNewsSummary, TradingViewNewsArticle} from "../types.js";
 
 const finalStatuses = ["expired", "completed", "failed", "incomplete", "canceled"]
+const SLEEP_IN_MS = 1000;
 
 const assistantInput = "call all available functions to generate the report"
 
-export const generateResponse = async (alphaVantage: any, news: any, filteredCongressTransactions: any, filteredSenateTransactions: any) => {
+export const generateResponse = async (alphaVantage: any, news: any, filteredCongressTransactions: any, filteredSenateTransactions: any): Promise<string> => {
     const thread = await createThread();
 
-    const message = await sendMessage(thread, assistantInput);
-    const run: Run = await runThread(thread);
-
-    while (finalStatuses.filter(value => value === run.status).length !== 0) {
+    let message = await sendMessage(thread, assistantInput);
+    let run: Run = await runThread(thread);
+    log.info("initial run state");
+    log.info(JSON.stringify(run.status))
+    while (finalStatuses.filter(value => value === run.status).length === 0) {
         if(run.status === 'in_progress') {
-            sleep(1000).then(r => console.log(`${r} sleeping`))
+            // @ts-ignore
+            sleep(SLEEP_IN_MS).then(r => console.log(`${r.status} sleeping`))
             continue;
         }
         if(run.status === "requires_action" && run.required_action !== null) {
             const requiredActions = run.required_action.submit_tool_outputs.tool_calls;
-            await callTools(thread.id, run.id, requiredActions, alphaVantage, news, filteredCongressTransactions, filteredSenateTransactions)
+            log.info("inside requires_action")
+            run = await callTools(thread.id, run.id, requiredActions, alphaVantage, news, filteredCongressTransactions, filteredSenateTransactions)
         }
-        const message = await sendMessage(thread, "finalize report. Drop missing fields. Convert output to markdown format");
+        log.info("exited function calls")
 
     }
-    if (finalStatuses.filter(value => value === run.status).length !== 0) {
-        const messages = await openai.beta.threads.messages.list(
-            run.thread_id
-        );
-        for (const message of messages.data.reverse()) {
+
+    run = await runThread(thread);
+    log.info(JSON.stringify(run.status))
+    message = await sendStringMessage(thread, "finalize report, do not call any additional functions. Drop missing fields. Only return the final report with markdown format");
+    while(finalStatuses.filter(value => value === run.status).length === 0) {
+        log.info("finalizing report")
+        log.info(run.status)
+        if(run.status === 'in_progress') {
             // @ts-ignore
-            console.log(`${message.role} > ${message.content[0].text.value}`);
+            sleep(SLEEP_IN_MS).then(r => console.log(`${r.status} sleeping`))
         }
-        return messages
     }
-    console.log(run.status);
-    return "failed";
+    if(run.status !== "completed") {
+        throw new Error(`${run} failed. Unable to generate response`)
+    }
+    const messages = await openai.beta.threads.messages.list(
+        run.thread_id
+    );
+    for (const message of messages.data.reverse()) {
+        // @ts-ignore
+        log.info(`${message.role} > ${message.content[0].text.value}`);
+    }
+    // @ts-ignore
+    return messages.data[0].content[0].text.value
 }
 
 
@@ -49,33 +67,38 @@ async function callTools(thread_id: string, run_id: string, requiredActions: Req
         const functionName = requiredAction.function.name
         const action_id = requiredAction.id;
         if(functionName === "getCompanyOverview") {
-            toolOutputs.push({tool_call_id: action_id, output: alphaVantage.companyOverview})
+            toolOutputs.push({tool_call_id: action_id, output: JSON.stringify(alphaVantage.companyOverview)})
         }
         if(functionName === "getBalanceSheet") {
-            toolOutputs.push({tool_call_id: action_id, output: alphaVantage.balanceSheet})
+            toolOutputs.push({tool_call_id: action_id, output: JSON.stringify(alphaVantage.balanceSheet)})
         }
         if(functionName === "getIncomeStatement") {
-            toolOutputs.push({tool_call_id: action_id, output: alphaVantage.incomeStatement})
+            toolOutputs.push({tool_call_id: action_id, output: JSON.stringify(alphaVantage.incomeStatement)})
         }
         if(functionName === "getCashFlow") {
-            toolOutputs.push({tool_call_id: action_id, output: alphaVantage.cashFlowStatement})
+            toolOutputs.push({tool_call_id: action_id, output: JSON.stringify(alphaVantage.cashFlowStatement)})
         }
         if(functionName === "getCompanyInsiderTransactions") {
-            toolOutputs.push({tool_call_id: action_id, output: alphaVantage.companyInsiderTransactions})
+            toolOutputs.push({tool_call_id: action_id, output: JSON.stringify(alphaVantage.companyInsiderTransactions)})
         }
         if(functionName === "getSenateAndCongressInsiderTransactions") {
-            toolOutputs.push({tool_call_id: action_id, output:{filteredSenateTransactions, filteredCongressTransactions}})
+            toolOutputs.push({tool_call_id: action_id, output: JSON.stringify({filteredSenateTransactions, filteredCongressTransactions})})
         }
         if(functionName === "getNews") {
-            toolOutputs.push({tool_call_id: action_id, output:news})
+            toolOutputs.push({tool_call_id: action_id, output: JSON.stringify(news)})
         }
     }
     // @ts-ignore
-    const run = await openai.beta.threads.runs.submitToolOutputs(thread_id, run_id, toolOutputs)
-
-    while (finalStatuses.filter(value => value === run.status).length !== 0) {
-        if(run.status === 'in_progress') {
-            sleep(1000).then(r => console.log(`${r} sleeping`))
+    //log.info(JSON.stringify(toolOutputs))
+    const run = await openai.beta.threads.runs.submitToolOutputsAndPoll(thread_id, run_id, {tool_outputs: toolOutputs})
+    log.info("status after submit tool outputs")
+    log.info(run.status)
+    //log.info(run.status)
+    while (finalStatuses.filter(value => value === run.status).length === 0) {
+        log.info(run.status)
+        if(run.status === 'in_progress' || run.status === "queued") {
+            // @ts-ignore
+            sleep(SLEEP_IN_MS).then(r => log.info(`${r.status} sleeping`))
         }
     }
 
@@ -83,4 +106,34 @@ async function callTools(thread_id: string, run_id: string, requiredActions: Req
         throw new Error("run can not be completed" + run.status)
     }
 
+    return run;
+
+}
+
+
+export const generateSummaries = async (news: TradingViewNewsArticle[]): Promise<GptNewsSummary> => {
+    const thread = await createThread();
+    const mappedNews = news.map(value => {
+        const news :TradingViewNewsArticle = value;
+        return {
+            descriptionText: news.descriptionText,
+            title: news.title
+        }
+    })
+    const message = await sendMessage(thread, mappedNews);
+    let run: Run = await runNewsThread(thread);
+
+    while (finalStatuses.filter(value => value === run.status).length === 0) {
+        if(run.status === 'in_progress' || run.status === "queued") {
+            sleep(SLEEP_IN_MS).then(r => log.info(`${r} sleeping`))
+        }
+    }
+    if(run.status !== "completed") {
+        throw new Error("cannot generate summaries")
+    }
+    const messages = await openai.beta.threads.messages.list(
+        run.thread_id
+    );
+    // @ts-ignore
+    return JSON.parse(messages.data[0].content[0].text.value);
 }

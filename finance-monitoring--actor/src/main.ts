@@ -1,9 +1,15 @@
 import { Actor, log } from "apify";
 import {fetchCongressTrading, fetchSenateTrading, parallelFetchQuiverQuant} from "./api/quiver-quant/query.js";
 import {fetchTradingViewNews, fetchTradingViewNewsDescriptions} from "./api/trading-view/news/query.js";
-import { generateResponse } from "./gpt/start.js";
+import {generateResponse, generateSummaries} from "./gpt/start.js";
 import { getStockAssessment } from "./gpt/ChatCompletion/chatCompletion.js";
-import { SenatorTransaction, NewsArticle, CompanyOverview, CongressTransaction } from "./types.js";
+import {
+    SenatorTransaction,
+    NewsArticle,
+    CompanyOverview,
+    CongressTransaction,
+    TradingViewNewsArticle, GptNewsSummary
+} from "./types.js";
 import {fetchCompanyOverview, parallelFetchAlphaVantage} from "./api/alpha-vantage/query.js";
 
 interface Input {
@@ -32,7 +38,8 @@ const pastYearDate = new Date();
 pastYearDate.setFullYear(today.getFullYear() - 1);
 
 const alphaVantage = await parallelFetchAlphaVantage(ticker);
-const news = await fetchTradingViewNewsDescriptions(ticker);
+const news: TradingViewNewsArticle[] = await fetchTradingViewNewsDescriptions(ticker);
+const summarizedNews: GptNewsSummary = await generateSummaries(news);
 const quiverQuant = await parallelFetchQuiverQuant(ticker);
 
 const filteredSenateTransactions = quiverQuant.senateTrading.filter(transaction => {
@@ -45,8 +52,11 @@ const filteredCongressTransactions = quiverQuant.congressTrading.filter(transact
     return transactionDate >= pastYearDate && transactionDate <= today;
   });
 
-const apiResponses = {alphaVantage, news, filteredCongressTransactions, filteredSenateTransactions}
-const gptResponse = generateResponse(alphaVantage, news, filteredCongressTransactions, filteredSenateTransactions);
+const apiResponses = {alphaVantage, summarizedNews, filteredCongressTransactions, filteredSenateTransactions}
+//log.info(JSON.stringify(apiResponses))
+const gptResponse = await generateResponse(alphaVantage, summarizedNews, filteredCongressTransactions, filteredSenateTransactions);
+log.info("final response")
+log.info(JSON.stringify(gptResponse))
 await Actor.pushData({ report: gptResponse });
 
 await Actor.exit();
