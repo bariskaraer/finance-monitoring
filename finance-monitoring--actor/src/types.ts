@@ -165,4 +165,139 @@ export interface CompanyOverview {
     DividendDate: string;
     ExDividendDate: string;
   }
-  
+
+
+export interface AnnualReport {
+    fiscalDateEnding: string; // Date in YYYY-MM-DD format
+    reportedCurrency: string; // Currency, e.g., "USD"
+    grossProfit: string; // Amount in string
+    totalRevenue: string; // Amount in string
+    costOfRevenue: string; // Amount in string
+    costofGoodsAndServicesSold: string; // Amount in string
+    operatingIncome: string; // Amount in string
+    sellingGeneralAndAdministrative: string; // Amount in string
+    researchAndDevelopment: string; // Amount in string
+    operatingExpenses: string; // Amount in string
+    investmentIncomeNet: string; // Amount in string or "None"
+    netInterestIncome: string; // Amount in string
+    interestIncome: string; // Amount in string
+    interestExpense: string; // Amount in string
+    nonInterestIncome: string; // Amount in string
+    otherNonOperatingIncome: string; // Amount in string
+    depreciation: string; // Amount in string
+    depreciationAndAmortization: string; // Amount in string
+    incomeBeforeTax: string; // Amount in string
+    incomeTaxExpense: string; // Amount in string
+    interestAndDebtExpense: string; // Amount in string or "None"
+    netIncomeFromContinuingOperations: string; // Amount in string
+    comprehensiveIncomeNetOfTax: string; // Amount in string
+    ebit: string; // Amount in string
+    ebitda: string; // Amount in string
+    netIncome: string; // Amount in string
+}
+
+export interface CompanyFinancials {
+    symbol: string; // Company symbol, e.g., "IBM"
+    annualReports: AnnualReport[]; // Array of annual reports
+}
+
+
+export interface BalanceSheetAnnualReport {
+    fiscalDateEnding: string; // Date in YYYY-MM-DD format
+    reportedCurrency: string; // Currency, e.g., "USD"
+    totalAssets: string; // Amount in string
+    totalCurrentAssets: string; // Amount in string
+    cashAndCashEquivalentsAtCarryingValue: string; // Amount in string
+    cashAndShortTermInvestments: string; // Amount in string
+    inventory: string; // Amount in string
+    currentNetReceivables: string; // Amount in string
+    totalNonCurrentAssets: string; // Amount in string
+    propertyPlantEquipment: string; // Amount in string
+    accumulatedDepreciationAmortizationPPE: string; // Amount in string or "None"
+    intangibleAssets: string; // Amount in string
+    intangibleAssetsExcludingGoodwill: string; // Amount in string
+    goodwill: string; // Amount in string
+    investments: string; // Amount in string
+    longTermInvestments: string; // Amount in string
+    shortTermInvestments: string; // Amount in string or "None"
+    otherCurrentAssets: string; // Amount in string or "None"
+    otherNonCurrentAssets: string; // Amount in string or "None"
+    totalLiabilities: string; // Amount in string
+    totalCurrentLiabilities: string; // Amount in string
+    currentAccountsPayable: string; // Amount in string
+    deferredRevenue: string; // Amount in string
+    currentDebt: string; // Amount in string
+    shortTermDebt: string; // Amount in string
+    totalNonCurrentLiabilities: string; // Amount in string
+    capitalLeaseObligations: string; // Amount in string
+    longTermDebt: string; // Amount in string
+    currentLongTermDebt: string; // Amount in string
+    longTermDebtNoncurrent: string; // Amount in string
+    shortLongTermDebtTotal: string; // Amount in string
+    otherCurrentLiabilities: string; // Amount in string or "None"
+    otherNonCurrentLiabilities: string; // Amount in string
+    totalShareholderEquity: string; // Amount in string
+    treasuryStock: string; // Amount in string
+    retainedEarnings: string; // Amount in string
+    commonStock: string; // Amount in string or "None"
+    commonStockSharesOutstanding: string; // Amount in string
+}
+
+export interface CompanyBalanceSheet {
+    symbol: string; // Company symbol, e.g., "IBM"
+    annualReports: BalanceSheetAnnualReport[]; // Array of annual reports
+}
+
+
+export interface AnnualCashFlowReport {
+    fiscalDateEnding: string; // Date in YYYY-MM-DD format
+    reportedCurrency: string; // Currency, e.g., "USD"
+    operatingCashflow: string; // Amount in string
+    paymentsForOperatingActivities: string; // Amount in string
+    proceedsFromOperatingActivities: string; // Amount in string or "None"
+    changeInOperatingLiabilities: string; // Amount in string
+    changeInOperatingAssets: string; // Amount in string
+    depreciationDepletionAndAmortization: string; // Amount in string
+    capitalExpenditures: string; // Amount in string
+    changeInReceivables: string; // Amount in string
+    changeInInventory: string; // Amount in string
+    profitLoss: string; // Amount in string
+    cashflowFromInvestment: string; // Amount in string
+    cashflowFromFinancing: string; // Amount in string
+    proceedsFromRepaymentsOfShortTermDebt: string; // Amount in string
+    paymentsForRepurchaseOfCommonStock: string; // Amount in string or "None"
+    paymentsForRepurchaseOfEquity: string; // Amount in string or "None"
+    paymentsForRepurchaseOfPreferredStock: string; // Amount in string or "None"
+    dividendPayout: string; // Amount in string
+    dividendPayoutCommonStock: string; // Amount in string
+    dividendPayoutPreferredStock: string; // Amount in string or "None"
+    proceedsFromIssuanceOfCommonStock: string; // Amount in string or "None"
+    proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet: string; // Amount in string
+    proceedsFromIssuanceOfPreferredStock: string; // Amount in string or "None"
+    proceedsFromRepurchaseOfEquity: string; // Amount in string
+    proceedsFromSaleOfTreasuryStock: string; // Amount in string or "None"
+    changeInCashAndCashEquivalents: string; // Amount in string or "None"
+    changeInExchangeRate: string; // Amount in string or "None"
+    netIncome: string; // Amount in string
+}
+
+export interface CompanyCashFlowStatement {
+    symbol: string; // Company symbol, e.g., "IBM"
+    annualReports: AnnualCashFlowReport[]; // Array of annual cash flow reports
+}
+
+
+export interface CompanyInsiderTransaction {
+    transaction_date: string; // Date in YYYY-MM-DD format
+    ticker: string; // Stock ticker symbol, e.g., "IBM"
+    executive: string; // Name of the executive
+    executive_title: string; // Title of the executive
+    security_type: string; // Type of security, e.g., "Rst. Stock Unit"
+    acquisition_or_disposal: string; // 'A' for acquisition, 'D' for disposal
+    shares: string; // Number of shares in string format
+    share_price: string; // Price per share in string format
+}
+
+export interface CompanyInsiderTransactionData {
+    data: CompanyInsiderTransaction[]; // Array of transactions
+}

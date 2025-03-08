@@ -37,11 +37,32 @@ export async function fetchTradingViewNews(
             publishDate: Number(item.publishDate),
             score: Number(item.score)
         };
-    
+
         // Insert news to PINECONE
         await insertNewsArticle(newsItem, ticker);
     }
 
     const pcResult = await searchTickerNews(`Latest ${ticker} stock news impacting price trends, investor sentiment, and major financial events in the past quarter.`, 5, ticker);
     return pcResult;
+}
+
+
+export async function fetchTradingViewNewsDescriptions(
+    ticker: any
+): Promise<String[]> {
+    const input = {
+        symbols: [`NASDAQ:${ticker}`],
+        proxy: {
+            useApifyProxy: true,
+            apifyProxyCountry: "US",
+        },
+        resultsLimit: 10,
+    };
+    const run = await client
+        .actor("mscraper/tradingview-news-scraper")
+        .call(input);
+
+    const { items } = await client.dataset(run.defaultDatasetId).listItems();
+
+    return items.map(value => String(value.descriptionText))
 }
