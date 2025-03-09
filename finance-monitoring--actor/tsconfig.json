@@ -17,5 +17,8 @@
     "./node_modules",
     "./node_modules/*",
     "./node_modules/@types/node/index.d.ts",
+    "node_modules/openai/src/core.ts",
+    "node_modules/openai/src/index.ts",
+    "node_modules/openai/src/lib/ChatCompletionStream.ts"
   ]
 }
