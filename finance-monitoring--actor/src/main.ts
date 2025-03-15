@@ -1,16 +1,12 @@
 import { Actor, log } from "apify";
-import {fetchCongressTrading, fetchSenateTrading, parallelFetchQuiverQuant} from "./api/quiver-quant/query.js";
-import {fetchTradingViewNews, fetchTradingViewNewsDescriptions} from "./api/trading-view/news/query.js";
-import {generateResponse, generateSummaries} from "./gpt/start.js";
-import { getStockAssessment } from "./gpt/ChatCompletion/chatCompletion.js";
+import {parallelFetchQuiverQuant} from "./api/quiver-quant/query.js";
+import {fetchTradingViewNewsDescriptions} from "./api/trading-view/news/query.js";
+import {generateInsiderSection, generateResponse, generateSummaries} from "./gpt/start.js";
 import {
-    SenatorTransaction,
-    NewsArticle,
-    CompanyOverview,
-    CongressTransaction,
     TradingViewNewsArticle, GptNewsSummary
 } from "./types.js";
-import {fetchCompanyOverview, parallelFetchAlphaVantage} from "./api/alpha-vantage/query.js";
+import {parallelFetchAlphaVantage} from "./api/alpha-vantage/query.js";
+import {getInsiderTrading} from "./insider-trading/get-insider-trading.js";
 
 interface Input {
     ticker: string;
@@ -42,19 +38,12 @@ const news: TradingViewNewsArticle[] = await fetchTradingViewNewsDescriptions(ti
 const summarizedNews: GptNewsSummary = await generateSummaries(news);
 const quiverQuant = await parallelFetchQuiverQuant(ticker);
 
-const filteredSenateTransactions = quiverQuant.senateTrading.filter(transaction => {
-  const transactionDate = new Date(transaction.Date);
-  return transactionDate >= pastYearDate && transactionDate <= today;
-});
 
-const filteredCongressTransactions = quiverQuant.congressTrading.filter(transaction => {
-    const transactionDate = new Date(transaction.TransactionDate);
-    return transactionDate >= pastYearDate && transactionDate <= today;
-  });
+const topInsiderTraders = getInsiderTrading(quiverQuant, alphaVantage);
+const insiderSection = await generateInsiderSection(topInsiderTraders);
 
-const apiResponses = {alphaVantage, summarizedNews, filteredCongressTransactions, filteredSenateTransactions}
-//log.info(JSON.stringify(apiResponses))
-const gptResponse = await generateResponse(alphaVantage, summarizedNews, filteredCongressTransactions, filteredSenateTransactions);
+
+const gptResponse = await generateResponse(alphaVantage, summarizedNews, insiderSection);
 log.info("final response")
 log.info(JSON.stringify(gptResponse))
 await Actor.pushData({ report: gptResponse });

@@ -22,3 +22,13 @@ export const runNewsThread = async (thread: any) => {
     return run;
 }
 
+export const runInsiderThread = async (thread: any) => {
+    let run: Run = await openai.beta.threads.runs.createAndPoll(
+        thread.id,
+        {
+            assistant_id: 'asst_3STCyKsz1ENk9AqnTMN2ZBXR',
+        }
+    );
+    return run;
+}
+

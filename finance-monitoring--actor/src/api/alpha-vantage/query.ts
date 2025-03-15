@@ -25,7 +25,7 @@ export async function fetchCompanyOverview(ticker: string): Promise<CompanyOverv
         );
         return response.data as CompanyOverview;
     } catch (error) {
-        console.error("Error fetching data:", error);
+        log.error(`Error fetching data in for fetchCompanyOverview. (error: ${error})`);
         throw error;
     }
 }
@@ -39,7 +39,7 @@ export async function fetchIncomeStatement(ticker: string): Promise<CompanyFinan
         );
         return response.data as CompanyFinancials;
     } catch (error) {
-        console.error("Error fetching data:", error);
+        log.error(`Error fetching data in for fetchIncomeStatement. (error: ${error})`);
         throw error;
     }
 }
@@ -53,7 +53,7 @@ export async function fetchBalanceSheet(ticker: string): Promise<CompanyBalanceS
         );
         return response.data as CompanyBalanceSheet;
     } catch (error) {
-        console.error("Error fetching data:", error);
+        log.error(`Error fetching data in for fetchBalanceSheet. (error: ${error})`);
         throw error;
     }
 }
@@ -67,7 +67,7 @@ export async function fetchCashFlowStatement(ticker: string): Promise<CompanyCas
         );
         return response.data as CompanyCashFlowStatement;
     } catch (error) {
-        console.error("Error fetching data:", error);
+        log.error(`Error fetching data in for fetchCashFlowStatement. (error: ${error})`);
         throw error;
     }
 }
@@ -76,12 +76,12 @@ export async function fetchCompanyInsiderTransaction(ticker: string): Promise<Co
     try {
 
         const response = await axios.get(
-            `${BASE_URL}BALANCE_SHEET&symbol=${ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
+            `${BASE_URL}INSIDER_TRANSACTIONS&symbol=${ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
             HEADERS
         );
         return response.data as CompanyInsiderTransactionData;
     } catch (error) {
-        console.error("Error fetching data:", error);
+        log.error(`Error fetching data in for fetchCompanyInsiderTransaction. (error: ${error})`);
         throw error;
     }
 }
@@ -104,7 +104,7 @@ export async function parallelFetchAlphaVantage(ticker: string) {
             companyInsiderTransactions
         };
     } catch (error) {
-        console.error("Error fetching data in parallel:", error);
+        log.error(`Error fetching data in parallel for alpha vantage. (error: ${error})`);
         throw error;
     }
 }
