@@ -5,7 +5,8 @@ import {
     CompanyCashFlowStatement,
     CompanyFinancials,
     CompanyInsiderTransactionData,
-    CompanyOverview
+    CompanyOverview,
+    NewsFeed
 } from "../../types.js";
 import {log} from "apify";
 
@@ -80,6 +81,19 @@ export async function fetchCompanyInsiderTransaction(ticker: string): Promise<Co
             HEADERS
         );
         return response.data as CompanyInsiderTransactionData;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error;
+    }
+}
+
+export async function fetchNewsSentiment(ticker: string): Promise<NewsFeed> {
+    try {
+        const response = await axios.get(
+            `${BASE_URL}NEWS_SENTIMENT&symbol=${ticker}&limit=100&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
+            HEADERS
+        );
+        return response.data as NewsFeed;
     } catch (error) {
         console.error("Error fetching data:", error);
         throw error;

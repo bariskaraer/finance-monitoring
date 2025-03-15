@@ -302,6 +302,43 @@ export interface CompanyInsiderTransactionData {
     data: CompanyInsiderTransaction[]; // Array of transactions
 }
 
+export type SentimentLabel = "Bearish" | "Somewhat-Bearish" | "Neutral" | "Somewhat-Bullish" | "Bullish";
+
+export type Topic = {
+  topic: string;
+  relevance_score: string;
+};
+
+export type TickerSentiment = {
+  ticker: string;
+  relevance_score: string;
+  ticker_sentiment_score: string;
+  ticker_sentiment_label: SentimentLabel;
+};
+
+export type FeedItem = {
+  title: string;
+  url: string;
+  time_published: string;
+  authors: string[];
+  summary: string;
+  banner_image: string;
+  source: string;
+  category_within_source: string;
+  source_domain: string;
+  topics: Topic[];
+  overall_sentiment_score: number;
+  overall_sentiment_label: SentimentLabel;
+  ticker_sentiment: TickerSentiment[];
+};
+
+export type NewsFeed = {
+  items: string;
+  sentiment_score_definition: string;
+  relevance_score_definition: string;
+  feed: FeedItem[];
+};
+
 export interface TradingViewNewsArticle {
     source: string;
     descriptionText: string;
