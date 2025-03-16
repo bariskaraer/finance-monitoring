@@ -1,6 +1,12 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { CongressTransaction, SenatorTransaction } from "../../types.js";
+import {
+    fetchBalanceSheet,
+    fetchCashFlowStatement, fetchCompanyInsiderTransaction,
+    fetchCompanyOverview,
+    fetchIncomeStatement
+} from "../alpha-vantage/query.js";
 
 dotenv.config();
 
@@ -37,5 +43,21 @@ export async function fetchCongressTrading(ticker: string): Promise<CongressTran
     } catch (error) {
         // console.error("Error fetching data:", error);
         throw new Error("An error occured while fetching quiver quant insider data.");
+    }
+}
+
+export async function parallelFetchQuiverQuant(ticker: string) {
+    try {
+        const [senateTrading, congressTrading] = await Promise.all([
+            fetchSenateTrading(ticker),
+            fetchCongressTrading(ticker)
+        ]);
+
+        return {
+            senateTrading, congressTrading
+        };
+    } catch (error) {
+        console.error("Error fetching data in parallel:", error);
+        throw error;
     }
 }

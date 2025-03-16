@@ -6,8 +6,27 @@ export const runThread = async (thread: any) => {
     let run: Run = await openai.beta.threads.runs.createAndPoll(
         thread.id,
         {
-            assistant_id: 'asst_YrQpRPrbUPshKNorDV68CGel',
-            instructions: "You are a financial assistant. Your input is a JSON object with a scheme involving `news_feed` which gives descriptions about the new. and `insider_feed` which contains the senator members buy and sell history.  Transaction purchase suggests a positive trend. Assess the stock's outlook and summarize the sentiment towards the requested stock ticker. "
+            assistant_id: 'asst_PSZGA3uQ2QecNg35iDNL8lmS',
+        }
+    );
+    return run;
+}
+
+export const runNewsThread = async (thread: any) => {
+    let run: Run = await openai.beta.threads.runs.createAndPoll(
+        thread.id,
+        {
+            assistant_id: 'asst_VLor5jtjUY20Ijd5SKiulD8V',
+        }
+    );
+    return run;
+}
+
+export const runInsiderThread = async (thread: any) => {
+    let run: Run = await openai.beta.threads.runs.createAndPoll(
+        thread.id,
+        {
+            assistant_id: 'asst_3STCyKsz1ENk9AqnTMN2ZBXR',
         }
     );
     return run;

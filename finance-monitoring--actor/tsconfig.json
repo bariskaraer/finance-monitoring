@@ -6,10 +6,23 @@
         "target": "ES2022",
         "outDir": "dist",
         "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "noImplicitReturns": false,
+        "strict": false,
         "skipLibCheck": true,
-        "lib": ["DOM"]
+        "lib": ["DOM"],
+        "types": []
     },
     "include": [
         "./src/**/*"
-    ]
+    ],
+    "exclude": [
+    "node_modules",
+    "./node_modules",
+    "./node_modules/*",
+    "./node_modules/@types/node/index.d.ts",
+    "node_modules/openai/src/core.ts",
+    "node_modules/openai/src/index.ts",
+    "node_modules/openai/src/lib/ChatCompletionStream.ts"
+  ]
 }
