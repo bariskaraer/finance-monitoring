@@ -180,7 +180,7 @@ export class ChargingManager<ChargeEventId extends string> {
             return { chargedCount: 0, outcome: 'charge_limit_reached', eventChargeLimitReached: true };
         }
 
-        const chargeableCount = Math.min(metadata.length, remainingEventChargeCount);
+        const chargeableCount = Math.min(Math.max(1, metadata.length), remainingEventChargeCount);
         // Locally, we just skip this but do everything else as test
         if (Actor.isAtHome()) {
             await chargeRequest<ChargeEventId>(event, chargeableCount);

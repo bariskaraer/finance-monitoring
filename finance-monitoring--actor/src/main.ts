@@ -43,12 +43,12 @@ if(!isTickerValid(ticker, tickerSearch)){
 }
 const alphaVantage = await parallelFetchAlphaVantage(ticker);
 const avCharge = await chargingManager.charge('alpha-vantage-scraped', []);
-console.log('Charge result for alpha-vantage-scraped');
+console.log('Charge result for alpha-vantage');
 console.dir(avCharge);
 
 const news: TradingViewNewsArticle[] = await fetchTradingViewNewsDescriptions(ticker);
 const newsCharge = await chargingManager.charge('trading-view-scraped', []);
-console.log('Charge result for trading-view-scraped');
+console.log('Charge result for trading-view');
 console.dir(newsCharge);
 
 const summarizedNews: GptNewsSummary = await generateSummaries(news);
@@ -58,7 +58,7 @@ console.dir(summarizedNewsCharge);
 
 const quiverQuant = await parallelFetchQuiverQuant(ticker);
 const quiverQuantCharge = await chargingManager.charge('quiver-quant-scraped', []);
-console.log('Charge result for quiver-quant-scraped');
+console.log('Charge result for quiver-quant');
 console.dir(quiverQuantCharge);
 log.info("fetched api calls");
 
