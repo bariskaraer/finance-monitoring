@@ -46,6 +46,7 @@ export const generateResponse = async (alphaVantage: any, news: any, topInsiderT
             sleep(SLEEP_IN_MS).then(r => console.log(`${r.status} sleeping`))
         }
     }
+    let lastMessage: string = '';
     if(run.status !== "completed") {
         throw new Error(`${run} failed. Unable to generate response`)
     }
@@ -54,10 +55,11 @@ export const generateResponse = async (alphaVantage: any, news: any, topInsiderT
     );
     for (const message of messages.data.reverse()) {
         // @ts-ignore
-        log.info(`${message.role} > ${message.content[0].text.value}`);
+        lastMessage = message.content[0].text.value;
+        log.info(`${message.role} > ${lastMessage}`);
     }
     // @ts-ignore
-    return messages.data[messages.data.length - 1].content[0].text.value
+    return lastMessage
 }
 
 
