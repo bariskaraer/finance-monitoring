@@ -27,8 +27,6 @@ log.setLevel(log.LEVELS.INFO);
 log.info("starting");
 
 
-
-
 // Filter between dates (inclusive)
 const today = new Date();
 const pastYearDate = new Date();
@@ -46,8 +44,9 @@ const insiderSection = await generateInsiderSection(topInsiderTraders);
 
 
 const gptResponse = await generateResponse(alphaVantage, summarizedNews, insiderSection);
-log.info("final response")
+log.info("final response start")
 log.info(JSON.stringify(gptResponse))
+log.info("final response end")
 await Actor.pushData({ report: gptResponse });
 
 await Actor.exit();

@@ -35,9 +35,10 @@ export const generateResponse = async (alphaVantage: any, news: any, topInsiderT
 
     }
 
-    run = await runThread(thread);
+
     log.info(JSON.stringify(run.status))
     message = await sendStringMessage(thread, "finalize report, do not call any additional functions. Only return the final report with markdown format, do not add any other text other than markdown fields.");
+    run = await runThread(thread);
     while(finalStatuses.filter(value => value === run.status).length === 0) {
         log.info("finalizing report")
         log.info(run.status)
@@ -56,7 +57,7 @@ export const generateResponse = async (alphaVantage: any, news: any, topInsiderT
     for (const message of messages.data.reverse()) {
         // @ts-ignore
         lastMessage = message.content[0].text.value;
-        log.info(`${message.role} > ${lastMessage}`);
+        //log.info(`${message.role} > ${lastMessage}`);
     }
     // @ts-ignore
     return lastMessage
