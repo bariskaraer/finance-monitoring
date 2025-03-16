@@ -8,20 +8,30 @@ import {
 import {fetchTickerSearch, parallelFetchAlphaVantage} from "./api/alpha-vantage/query.js";
 import {getInsiderTrading} from "./insider-trading/get-insider-trading.js";
 import {isTickerValid} from "./validator/ticker-validator.js";
+import { ChargingManager } from './charging-manager.js';
+import { pushDataPPEAware } from './push-data-ppe.js';
 
 interface Input {
     ticker: string;
     llmAPIKey: string;
 }
 
-// Rate limits for OpenAI API lowest tier
-const RATE_LIMIT_PER_MINUTE = 500;
-const REQUEST_INTERVAL_MS = Math.ceil(60000 / RATE_LIMIT_PER_MINUTE); // Interval between requests in ms
+export type EventId = 'actor-start-gb' | 'quiver-quant-scraped' | 'alpha-vantage-scraped' | 'trading-view-scraped'| 'openai-llm-process' | 'openai-report-process'
 
 // The init() call configures the Actor for its environment. It's recommended to start every Actor with an init()
 await Actor.init();
+const chargingManager = await ChargingManager.initialize<EventId>();
 
-// Burada time horizon da olmalı in days belki
+
+if ((await chargingManager.chargedEventCount('actor-start-gb') === 0)) {
+    const actorRunGBs = Math.ceil((Actor.getEnv().memoryMbytes!) / 1024);
+    const actorStartEventsMetadata = Array.from({ length: actorRunGBs }, () => ({}));
+    const chargeResultStart = await chargingManager.charge('actor-start-gb', actorStartEventsMetadata);
+    console.log('Charge result for actor-start-gb');
+    console.dir(chargeResultStart);
+}
+
+
 const { ticker = "AAPL", llmAPIKey = "100" } =
     (await Actor.getInput<Input>()) ?? ({} as Input);
 log.setLevel(log.LEVELS.INFO);
@@ -31,17 +41,25 @@ const tickerSearch: TickerSearchResult = await fetchTickerSearch(ticker);
 if(!isTickerValid(ticker, tickerSearch)){
     throw new Error("Ticker is not valid")
 }
-
-
-// Filter between dates (inclusive)
-const today = new Date();
-const pastYearDate = new Date();
-pastYearDate.setFullYear(today.getFullYear() - 1);
-
 const alphaVantage = await parallelFetchAlphaVantage(ticker);
+const avCharge = await chargingManager.charge('alpha-vantage-scraped', []);
+console.log('Charge result for alpha-vantage');
+console.dir(avCharge);
+
 const news: TradingViewNewsArticle[] = await fetchTradingViewNewsDescriptions(ticker);
+const newsCharge = await chargingManager.charge('trading-view-scraped', []);
+console.log('Charge result for trading-view');
+console.dir(newsCharge);
+
 const summarizedNews: GptNewsSummary = await generateSummaries(news);
+const summarizedNewsCharge = await chargingManager.charge('openai-llm-process', []);
+console.log('Charge result for openai-llm-process');
+console.dir(summarizedNewsCharge);
+
 const quiverQuant = await parallelFetchQuiverQuant(ticker);
+const quiverQuantCharge = await chargingManager.charge('quiver-quant-scraped', []);
+console.log('Charge result for quiver-quant');
+console.dir(quiverQuantCharge);
 log.info("fetched api calls");
 
 
@@ -50,11 +68,13 @@ const insiderSection: string = await generateInsiderSection(topInsiderTraders);
 
 
 const gptResponse: string = await generateResponse(alphaVantage, summarizedNews, insiderSection);
+const gptReportCharge = await chargingManager.charge('openai-report-process', []);
+console.log('Charge result for openai-report-process');
+console.dir(gptReportCharge);
+
 log.info("final response start")
 log.info(gptResponse)
 log.info("final response end")
 await Actor.pushData({ report: gptResponse });
 
 await Actor.exit();
-
-// await Dataset.pushData({ url: request.loadedUrl, title });
