@@ -57,7 +57,7 @@ export const generateResponse = async (alphaVantage: any, news: any, topInsiderT
         log.info(`${message.role} > ${message.content[0].text.value}`);
     }
     // @ts-ignore
-    return messages.data[0].content[0].text.value
+    return messages.data[messages.data.length - 1].content[0].text.value
 }
 
 
