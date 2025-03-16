@@ -354,3 +354,14 @@ export interface NewsSummary {
     sentiment_score: string;
     relevance_score: string;
 }
+
+
+export interface TickerSearchResult {
+    bestMatches: TickerSearchDto[];
+}
+
+export interface TickerSearchDto {
+    "1. symbol": string,
+    "3. type": string,
+    "4. region": string
+}

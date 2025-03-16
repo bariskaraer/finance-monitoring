@@ -60,7 +60,7 @@ export const generateResponse = async (alphaVantage: any, news: any, topInsiderT
         //log.info(`${message.role} > ${lastMessage}`);
     }
     // @ts-ignore
-    return lastMessage
+    return `${lastMessage}`
 }
 
 

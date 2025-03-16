@@ -3,10 +3,11 @@ import {parallelFetchQuiverQuant} from "./api/quiver-quant/query.js";
 import {fetchTradingViewNewsDescriptions} from "./api/trading-view/news/query.js";
 import {generateInsiderSection, generateResponse, generateSummaries} from "./gpt/start.js";
 import {
-    TradingViewNewsArticle, GptNewsSummary
+    TradingViewNewsArticle, GptNewsSummary, TickerSearchResult
 } from "./types.js";
-import {parallelFetchAlphaVantage} from "./api/alpha-vantage/query.js";
+import {fetchTickerSearch, parallelFetchAlphaVantage} from "./api/alpha-vantage/query.js";
 import {getInsiderTrading} from "./insider-trading/get-insider-trading.js";
+import {isTickerValid} from "./validator/ticker-validator.js";
 
 interface Input {
     ticker: string;
@@ -26,6 +27,11 @@ const { ticker = "AAPL", llmAPIKey = "100" } =
 log.setLevel(log.LEVELS.INFO);
 log.info("starting");
 
+const tickerSearch: TickerSearchResult = await fetchTickerSearch(ticker);
+if(!isTickerValid(ticker, tickerSearch)){
+    throw new Error("Ticker is not valid")
+}
+
 
 // Filter between dates (inclusive)
 const today = new Date();
@@ -40,12 +46,12 @@ log.info("fetched api calls");
 
 
 const topInsiderTraders = getInsiderTrading(quiverQuant, alphaVantage);
-const insiderSection = await generateInsiderSection(topInsiderTraders);
+const insiderSection: string = await generateInsiderSection(topInsiderTraders);
 
 
-const gptResponse = await generateResponse(alphaVantage, summarizedNews, insiderSection);
+const gptResponse: string = await generateResponse(alphaVantage, summarizedNews, insiderSection);
 log.info("final response start")
-log.info(JSON.stringify(gptResponse))
+log.info(gptResponse)
 log.info("final response end")
 await Actor.pushData({ report: gptResponse });
 
