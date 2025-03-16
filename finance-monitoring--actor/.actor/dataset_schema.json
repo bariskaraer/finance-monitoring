@@ -1,0 +1,23 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": [
+                    "report"
+                ]
+            },
+            "display": {
+                        "component": "table",
+                        "properties": {
+                            "report": {
+                                "label": "GPTReport",
+                                "format": "text"
+                            }
+                        }
+                    }
+        }
+    }
+}
