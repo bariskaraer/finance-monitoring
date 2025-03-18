@@ -3,6 +3,7 @@
 ## Overview
 
 The Finance Monitoring Agent is a comprehensive tool designed to help users monitor financial data and investment sentiments by scraping and analyzing information about publicly traded companies.
+Trading stocks and making informed investment decisions requires access to critical market insights. This system aggregates key data points, including **recent news**, publicly available information on **U.S. Senate and House of Representatives transactions**, and **technical indicators**. It then generates a comprehensive report, providing essential analysis to support investment decisions.
 
 ## Included Features
 
@@ -32,9 +33,11 @@ apify run
 ```
 
 ⬇️ Input
+
 The input should include one or multiple stock symbols, market exchanges, and optional data sources. You can provide inputs as single values.
 
-Example input for tracking AAPL and TSLA on the NASDAQ exchange:
+Please use a valid ticker, if the ticker is not valid the Actor will throw an error.
+Example input for tracking AAPL on the NASDAQ exchange:
 
 ```json
 {
@@ -43,7 +46,9 @@ Example input for tracking AAPL and TSLA on the NASDAQ exchange:
 ```
 
 ⬆️ Output example
-The extracted stock data will be stored as a dataset, viewable in the Output tab. Here’s an example output in MD format:
+The extracted stock data will be stored as a dataset, viewable in the Output tab.
+
+Here’s an example output in MD format:
 
 ```md
 **Financial Monitoring Report: Apple Inc.**
@@ -232,3 +237,7 @@ The extracted stock data will be stored as a dataset, viewable in the Output tab
         - ✅ Diversifying supply chains to mitigate tariff impacts.
         - ✅ Continued focus on product innovation and service growth.
 ```
+
+## License
+
+This project is licensed under the MIT License.
