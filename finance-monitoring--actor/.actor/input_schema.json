@@ -1,24 +1,18 @@
 {
-    "title": "CheerioCrawler Template",
+    "title": "Finance Monitoring Template",
     "type": "object",
     "schemaVersion": 1,
     "properties": {
-        "startUrls": {
-            "title": "Start URLs",
-            "type": "array",
-            "description": "URLs to start with.",
+        "ticker": {
+            "title": "Ticker of the stock",
+            "type": "string",
+            "description": "Ticker of the stock to assess.",
             "editor": "requestListSources",
             "prefill": [
                 {
-                    "url": "https://crawlee.dev"
+                    "ticker": "AAPL"
                 }
             ]
-        },
-        "maxRequestsPerCrawl": {
-            "title": "Max Requests per Crawl",
-            "type": "integer",
-            "description": "Maximum number of requests that can be made by this crawler.",
-            "default": 100
         }
     }
 }
