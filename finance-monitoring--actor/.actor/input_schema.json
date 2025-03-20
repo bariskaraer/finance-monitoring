@@ -5,9 +5,8 @@
     "properties": {
         "ticker": {
             "title": "Ticker of the stock",
-            "type": "string",
+            "type": "object",
             "description": "Ticker of the stock to assess.",
-            "editor": "requestListSources",
             "prefill": [
                 {
                     "ticker": "AAPL"
