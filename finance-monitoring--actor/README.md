@@ -46,6 +46,7 @@ Example input for tracking AAPL on the NASDAQ exchange:
 ```
 
 ⬆️ Output example
+
 The extracted stock data will be stored as a dataset, viewable in the Output tab.
 Also you can download it inside the "Ticker-Assesments" key-value store, under the key "Stock-Assesment" as a txt file.
 
