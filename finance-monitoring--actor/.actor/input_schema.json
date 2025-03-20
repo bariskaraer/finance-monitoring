@@ -1,17 +1,15 @@
 {
-    "title": "Finance Monitoring Template",
-    "type": "object",
-    "schemaVersion": 1,
-    "properties": {
-        "ticker": {
-            "title": "Ticker of the stock",
-            "type": "object",
-            "description": "Ticker of the stock to assess.",
-            "prefill": [
-                {
-                    "ticker": "AAPL"
-                }
-            ]
-        }
+  "title": "Ticker Input",
+  "description": "Input schema requiring a stock ticker symbol",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "ticker": {
+      "title": "Stock Ticker",
+      "type": "string",
+      "description": "The stock ticker symbol to analyze",
+      "editor": "textfield"
     }
+  },
+  "required": ["ticker"]
 }
