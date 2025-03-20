@@ -77,4 +77,8 @@ log.info(gptResponse)
 log.info("final response end")
 await Actor.pushData({ report: gptResponse });
 
+// Add the report to key value store
+const exampleStore = await Actor.openKeyValueStore('Ticker-Assesments');
+await exampleStore.setValue('Stock-Assesment', gptResponse, { contentType: 'string' });
+
 await Actor.exit();
